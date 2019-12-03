@@ -1,0 +1,168 @@
+<!--Insert JS-->    
+<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!--Configure firebase-->
+<html>
+    <?php $tt = $_POST["title"]; ?>
+    console.log($tt);
+</html>
+<script>
+
+    var config = {
+        apiKey: "AIzaSyCRkA7lUQPN7RnetG0238geK6BwTiCUrpQ",
+        authDomain: "ecg-261405.firebaseapp.com",
+        databaseURL: "https://ecg-261405.firebaseio.com",
+        projectId: "ecg-261405",
+        storageBucket: "ecg-261405.appspot.com",
+        messagingSenderId: "727005807636",
+        appId: "1:727005807636:web:6ff5055249f7fb06a79301",
+        measurementId: "G-5PSDECTKDX"
+    };
+
+    var thumbnail;
+    var file;
+    var obj;
+
+    firebase.initializeApp(config);
+    var database = firebase.database();
+
+    var fileButton = document.getElementById("fileButton");
+    console.log("here")
+    console.log("elsaaaaaaaaa");
+    var filename = localStorage.getItem("filename");
+    var title = localStorage.getItem("title");
+    var content = localStorage.getItem("content");
+    var carid = localStorage.getItem("carid");
+    var carcount = localStorage.getItem("carcount");
+
+    /*fileButton.addEventListener('change', function(e){
+    file = e.target.files[0];
+    var storageRef = firebase.storage().ref(file.name);
+    storageRef.put(file);
+    thumbnail = "https://firebasestorage.googleapis.com/v0/b/"+config["storageBucket"]+"/o/"+file.name+"?alt=media";
+    }); */
+    var j = 0;
+    
+
+    $(document).ready(function(){
+        $(function() {
+            var sum = {
+                AVF: 0,
+                AVL: 0,
+                AVR: 0,
+                time: 0,
+                I: 0,
+                II: 0,
+                III: 0,
+                V1: 0,
+                V2: 0,
+                V3: 0,
+                V4: 0,
+                V5: 0,
+                V6: 0,
+                i: 0
+            }
+        $.getJSON(filename, function(json) {
+            for(var k=0;k<carcount;k++){
+                    var newtitle = title + k;
+            $.each(json.ecg_log, function(i, data) {
+            if(j<5){
+                sum.AVF = sum.AVF + data.AVF;
+                sum.AVL = sum.AVL + data.AVL;
+                sum.AVR = sum.AVR + data.AVR;
+                sum.time = sum.time + data.time;
+                sum.I = sum.I + data.I;
+                sum.II = sum.II + data.II;
+                sum.III = sum.III + data.III;
+                sum.V1 = sum.V1 + data.V1;
+                sum.V2 = sum.V2 + data.V2;
+                sum.V3 = sum.V3 + data.V3;
+                sum.V4 = sum.V4 + data.V4;
+                sum.V5 = sum.V5 + data.V5;
+                sum.V6 = sum.V6 + data.V6;
+                sum.i = sum.i + j;
+                //console.log(i+"+"+j);
+            }
+            if(j==4){
+                    //console.log(i+"+"+j);
+                    console.log( "JSON Data received, Data is " + j);
+                    j = 0;
+                    data.AVF = sum.AVF/4;
+                    data.AVL = sum.AVL/4;
+                    data.AVR = sum.AVR/4;
+                    data.time = data.time;
+                    data.I = sum.I/4;
+                    data.II = sum.II/4;
+                    data.III = sum.III/4;
+                    data.V1 = sum.V1/4;
+                    data.V2 = sum.V2/4;
+                    data.V3 = sum.V3/4;
+                    data.V4 = sum.V4/4;
+                    data.V5 = sum.V5/4;
+                    data.V6 = sum.V6/4;
+                    data.i = sum.i/4;
+                    sum.AVF = 0;
+                    sum.AVL = 0;
+                    sum.AVR = 0;
+                    sum.time = 0;
+                    sum.I = 0;
+                    sum.II = 0;
+                    sum.III = 0;
+                    sum.V1 = 0;
+                    sum.V2 = 0;
+                    sum.V3 = 0;
+                    sum.V4 = 0;
+                    sum.V5 = 0;
+                    sum.V6 = 0;
+                    sum.i = 0;
+                    console.log( "JSON Data received, Data average is " + data.I);
+                var subtime = data.time.toString().split(".");
+                if(subtime[0]<10){
+                    subtime[0] = subtime[0].padStart(2, '0');
+                }
+                console.log(subtime[0]);
+                var jointime = subtime.join(":");
+                console.log( "JSON Data received, Data average is " + jointime);
+
+                //var title = document.getElementById('title').value;
+                //var content = document.getElementById('content').value;
+                var rootRef = firebase.database().ref();
+                
+                var storesRef = rootRef.child('test/'+newtitle+'/'+content+'/'+'1ecglog/');
+                var newStoreRef = storesRef.push();
+                newStoreRef.set({
+                    "AVF": parseFloat(data.AVF.toFixed(4)),
+                    "AVL": parseFloat(data.AVL.toFixed(4)),
+                    "AVR": parseFloat(data.AVR.toFixed(4)),
+                    "time": data.time,
+                    "I": parseFloat(data.I.toFixed(4)),
+                    "II": parseFloat(data.II.toFixed(4)),
+                    "III": parseFloat(data.III.toFixed(4)),
+                    "V1": parseFloat(data.V1.toFixed(4)),
+                    "V2": parseFloat(data.V2.toFixed(4)),
+                    "V3": parseFloat(data.V3.toFixed(4)),
+                    "V4": parseFloat(data.V4.toFixed(4)),
+                    "V5": parseFloat(data.V5.toFixed(4)),
+                    "V6": parseFloat(data.V6.toFixed(4)),
+                    "i": i
+                });
+                
+            }
+            j++;
+            });
+        }
+        });
+        var rootRef2 = firebase.database().ref();
+        for(var k=0;k<carcount;k++){
+                    var newtitle = title + k;
+        var storesRef2 = rootRef2.child('test/'+newtitle+'/'+content+'/2Amb_car/');
+        var newStoreRef2 = storesRef2;
+        newStoreRef2.set({
+            "Car_number": carid,
+            "Location": '100.24,-56.14'
+        });
+        }
+        });
+    });
+
+</script>
